@@ -1,19 +1,9 @@
 package com.tiempo.clima.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "consultas")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Consulta {
 
     @Id
@@ -24,12 +14,60 @@ public class Consulta {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @Column(nullable = false)
     private String ciudad;
-
-    @Column(nullable = false)
     private String tipoConsulta;
+    private LocalDateTime fecha;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaConsulta;
+    // Constructor vacío requerido por JPA
+    public Consulta() {
+    }
+
+    // Constructor con parámetros
+    public Consulta(Usuario usuario, String ciudad, String tipoConsulta, LocalDateTime fecha) {
+        this.usuario = usuario;
+        this.ciudad = ciudad;
+        this.tipoConsulta = tipoConsulta;
+        this.fecha = fecha;
+    }
+
+    // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public String getTipoConsulta() {
+        return tipoConsulta;
+    }
+
+    public void setTipoConsulta(String tipoConsulta) {
+        this.tipoConsulta = tipoConsulta;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
 }

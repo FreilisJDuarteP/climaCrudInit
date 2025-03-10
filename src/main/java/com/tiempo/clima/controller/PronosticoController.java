@@ -1,24 +1,24 @@
 package com.tiempo.clima.controller;
 
-import com.tiempo.clima.dto.PronosticoDTO;
+import com.tiempo.clima.dto.PronosticoResponse;
 import com.tiempo.clima.service.PronosticoService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/pronostico")
-@RequiredArgsConstructor
+@RequestMapping("/api/pronostico")
+@CrossOrigin
 public class PronosticoController {
 
     private final PronosticoService pronosticoService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/diario/{ciudad}")
-    public Flux<PronosticoDTO> obtenerPronosticoDiario(@PathVariable String ciudad,
-                                                       @RequestParam(defaultValue = "metric") String units,
-                                                       @RequestParam(defaultValue = "es") String lang) {
-        return pronosticoService.obtenerPronostico(ciudad, units, lang);
+    public PronosticoController(PronosticoService pronosticoService) {
+        this.pronosticoService = pronosticoService;
+    }
+
+    @GetMapping("/{ciudad}")
+    public ResponseEntity<PronosticoResponse> obtenerPronostico(@PathVariable String ciudad) {
+        PronosticoResponse pronostico = pronosticoService.obtenerPronostico(ciudad);
+        return ResponseEntity.ok(pronostico);
     }
 }

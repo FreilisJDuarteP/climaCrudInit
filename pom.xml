@@ -22,7 +22,7 @@
 	</properties>
 
 	<dependencies>
-		<!-- Spring Boot Web (MVC) -->
+		<!-- Spring Boot Starter Web para Spring MVC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -75,20 +75,6 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
-		<!-- Autenticación y cifrado -->
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>9.0.1</version>
-		</dependency>
-
-		<!-- Bucket4j para Rate Limiting -->
-		<dependency>
-			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j-core</artifactId>
-			<version>8.7.0</version>
-		</dependency>
-
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -116,14 +102,6 @@
 			<version>3.12.0</version>
 		</dependency>
 
-		<!-- Soporte para Servlets en Spring MVC -->
-		<dependency>
-			<groupId>jakarta.servlet</groupId>
-			<artifactId>jakarta.servlet-api</artifactId>
-			<version>6.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- Pruebas -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -135,6 +113,13 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j-core -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.7.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,25 +1,29 @@
 package com.tiempo.clima.controller;
 
-import com.tiempo.clima.dto.ContaminacionDTO;
+import com.tiempo.clima.dto.Mensaje;
 import com.tiempo.clima.service.ContaminacionService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/contaminacion")
-@RequiredArgsConstructor
+@CrossOrigin
 public class ContaminacionController {
 
     private final ContaminacionService contaminacionService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/actual/{ciudad}")
-    public Mono<ContaminacionDTO> obtenerContaminacionActual(@PathVariable String ciudad) {
-        return contaminacionService.obtenerCalidadAire(ciudad);
+    public ContaminacionController(ContaminacionService contaminacionService) {
+        this.contaminacionService = contaminacionService;
+    }
+
+    @PreAuthorize("hasRole('USER')") // Solo usuarios autenticados pueden acceder
+    @GetMapping("/ciudad/{nombreCiudad}")
+    public ResponseEntity<?> obtenerCalidadAire(@PathVariable String nombreCiudad) {
+        try {
+            return ResponseEntity.ok(contaminacionService.obtenerCalidadAire(nombreCiudad));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new Mensaje("Error al obtener calidad del aire: " + e.getMessage()));
+        }
     }
 }

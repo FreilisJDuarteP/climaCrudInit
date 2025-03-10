@@ -1,32 +1,29 @@
 package com.tiempo.clima.service;
 
-import com.tiempo.clima.dto.ContaminacionDTO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 @Service
 public class ContaminacionService {
 
-    private final WebClient webClient;
+    @Value("${api.pollution.url}")
+    private String apiUrl;
 
     @Value("${openweathermap.api.key}")
     private String apiKey;
 
-    public ContaminacionService(WebClient webClient) {
-        this.webClient = webClient;
+    private final RestTemplate restTemplate;
+
+    public ContaminacionService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    @Cacheable(value = "contaminacion", key = "#ciudad")
-    public Mono<ContaminacionDTO> obtenerCalidadAire(String ciudad) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/air_pollution")
-                        .queryParam("q", ciudad)
-                        .queryParam("appid", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(ContaminacionDTO.class);
+    public Map<String, Object> obtenerCalidadAire(String ciudad) {
+        String url = String.format("%s?q=%s&appid=%s", apiUrl, ciudad, apiKey);
+        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+        return response.getBody();
     }
 }

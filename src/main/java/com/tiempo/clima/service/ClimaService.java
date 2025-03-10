@@ -1,34 +1,29 @@
 package com.tiempo.clima.service;
 
-import com.tiempo.clima.dto.ClimaDTO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 @Service
 public class ClimaService {
 
-    private final WebClient webClient;
+    @Value("${api.weather.url}")
+    private String apiUrl;
 
     @Value("${openweathermap.api.key}")
     private String apiKey;
 
-    public ClimaService(WebClient webClient) {
-        this.webClient = webClient;
+    private final RestTemplate restTemplate;
+
+    public ClimaService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    @Cacheable(value = "clima", key = "#ciudad")
-    public Mono<ClimaDTO> obtenerClimaActual(String ciudad, String units, String lang) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/weather")
-                        .queryParam("q", ciudad)
-                        .queryParam("units", units)
-                        .queryParam("lang", lang)
-                        .queryParam("appid", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToMono(ClimaDTO.class);
+    public Map<String, Object> obtenerClima(String ciudad) {
+        String url = String.format("%s?q=%s&appid=%s&units=metric", apiUrl, ciudad, apiKey);
+        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+        return response.getBody();
     }
 }

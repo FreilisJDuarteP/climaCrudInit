@@ -1,34 +1,27 @@
 package com.tiempo.clima.service;
 
-import com.tiempo.clima.dto.PronosticoDTO;
+import com.tiempo.clima.dto.PronosticoResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PronosticoService {
 
-    private final WebClient webClient;
+    @Value("${api.forecast.url}")
+    private String apiUrl;
 
     @Value("${openweathermap.api.key}")
     private String apiKey;
 
-    public PronosticoService(WebClient webClient) {
-        this.webClient = webClient;
+    private final RestTemplate restTemplate;
+
+    public PronosticoService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    @Cacheable(value = "pronostico", key = "#ciudad")
-    public Flux<PronosticoDTO> obtenerPronostico(String ciudad, String units, String lang) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/forecast")
-                        .queryParam("q", ciudad)
-                        .queryParam("units", units)
-                        .queryParam("lang", lang)
-                        .queryParam("appid", apiKey)
-                        .build())
-                .retrieve()
-                .bodyToFlux(PronosticoDTO.class);
+    public PronosticoResponse obtenerPronostico(String ciudad) {
+        String url = String.format("%s?q=%s&cnt=5&appid=%s&units=metric&lang=es", apiUrl, ciudad, apiKey);
+        return restTemplate.getForObject(url, PronosticoResponse.class);
     }
 }

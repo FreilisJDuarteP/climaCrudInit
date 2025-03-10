@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -51,21 +52,36 @@ public class AuthController {
         if (usuarioService.existsByEmail(nuevoUsuario.getEmail())) {
             return ResponseEntity.badRequest().body(new Mensaje("Ese email ya existe"));
         }
-        Usuario usuario = new Usuario(null, nuevoUsuario.getNombreUsuario(), nuevoUsuario.getEmail(),
-                passwordEncoder.encode(nuevoUsuario.getPassword()), new HashSet<>());
+
+        Usuario usuario = new Usuario();
+        usuario.setNombreUsuario(nuevoUsuario.getNombreUsuario());
+        usuario.setEmail(nuevoUsuario.getEmail());
+        usuario.setPassword(passwordEncoder.encode(nuevoUsuario.getPassword()));
+
         Set<Rol> roles = new HashSet<>();
-        roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).orElseThrow());
+        Optional<Rol> userRole = rolService.getByRolNombre(RolNombre.USER); // Eliminado "ROLE_"
+        if (userRole.isPresent()) {
+            roles.add(userRole.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Mensaje("Error: El rol USER no está en la base de datos"));
+        }
+
         usuario.setRoles(roles);
         usuarioService.save(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(new Mensaje("Usuario guardado"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUsuario loginUsuario) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginUsuario.getNombreUsuario(), loginUsuario.getPassword()));
+                new UsernamePasswordAuthenticationToken(
+                        loginUsuario.getNombreUsuario(),
+                        loginUsuario.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
+
         return ResponseEntity.ok(new JwtDto(jwt));
     }
 }

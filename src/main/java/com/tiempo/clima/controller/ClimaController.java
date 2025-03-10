@@ -1,24 +1,29 @@
 package com.tiempo.clima.controller;
 
-import com.tiempo.clima.dto.ClimaDTO;
+import com.tiempo.clima.dto.Mensaje;
 import com.tiempo.clima.service.ClimaService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/clima")
-@RequiredArgsConstructor
+@CrossOrigin
 public class ClimaController {
 
     private final ClimaService climaService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/actual/{ciudad}")
-    public Mono<ClimaDTO> obtenerClimaActual(@PathVariable String ciudad,
-                                             @RequestParam(defaultValue = "metric") String units,
-                                             @RequestParam(defaultValue = "es") String lang) {
-        return climaService.obtenerClimaActual(ciudad, units, lang);
+    public ClimaController(ClimaService climaService) {
+        this.climaService = climaService;
+    }
+
+    @PreAuthorize("hasRole('USER')") // Solo usuarios autenticados pueden acceder
+    @GetMapping("/ciudad/{nombreCiudad}")
+    public ResponseEntity<?> obtenerClima(@PathVariable String nombreCiudad) {
+        try {
+            return ResponseEntity.ok(climaService.obtenerClima(nombreCiudad));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new Mensaje("Error al obtener el clima: " + e.getMessage()));
+        }
     }
 }
