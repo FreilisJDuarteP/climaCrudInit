@@ -20,7 +20,6 @@ public class ConsultaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // ✅ Registrar consulta con objeto Usuario
     public void registrarConsulta(Usuario usuario, String ciudad, String resultado) {
         Consulta consulta = new Consulta();
         consulta.setUsuario(usuario);
@@ -30,8 +29,6 @@ public class ConsultaService {
 
         consultaRepository.save(consulta);
     }
-
-    // ✅ Buscar por nombre de usuario
     public List<Consulta> obtenerConsultasPorUsuario(String nombreUsuario) {
         Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

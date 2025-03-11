@@ -25,7 +25,7 @@ public class ContaminacionService {
 
     private final RestTemplate restTemplate;
     private final ConsultaService consultaService;
-    private final UsuarioService usuarioService; // ✅ Inyectar UsuarioService
+    private final UsuarioService usuarioService;
 
     public ContaminacionService(
             RestTemplate restTemplate,
@@ -38,11 +38,11 @@ public class ContaminacionService {
 
     @Cacheable(value = "contaminacion", key = "#ciudad")
     public ContaminacionResponse obtenerCalidadAire(String ciudad, String nombreUsuario) {
-        // ✅ 1. Obtener el objeto Usuario desde el nombre
+
         Usuario usuario = usuarioService.getByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 🔎 2. Obtener coordenadas geográficas de la ciudad
+
         String geoUrl = String.format("%s?q=%s&limit=1&appid=%s", geoApiUrl, ciudad, apiKey);
         List<Map<String, Object>> geoResponse = restTemplate.getForObject(geoUrl, List.class);
 
@@ -54,7 +54,7 @@ public class ContaminacionService {
         double lat = (double) location.get("lat");
         double lon = (double) location.get("lon");
 
-        // 🌍 3. Obtener calidad del aire usando coordenadas
+
         String pollutionUrl = String.format("%s?lat=%f&lon=%f&appid=%s", pollutionApiUrl, lat, lon, apiKey);
         Map<String, Object> pollutionResponse = restTemplate.getForObject(pollutionUrl, Map.class);
 
@@ -66,7 +66,7 @@ public class ContaminacionService {
         Map<String, Object> main = (Map<String, Object>) list.get(0).get("main");
         int aqi = (int) main.get("aqi");
 
-        // ✅ 4. Registrar la consulta mediante ConsultaService
+
         String resultado = traducirAqi(aqi);
         consultaService.registrarConsulta(usuario, ciudad, resultado);
 

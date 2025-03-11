@@ -35,24 +35,24 @@ public class PronosticoController {
 
     @GetMapping("/{ciudad}")
     public ResponseEntity<?> obtenerPronostico(@PathVariable String ciudad, Authentication authentication) {
-        // ✅ Obtener el nombre de usuario autenticado
+
         String username = authentication.getName();
 
-        // ✅ Obtener el objeto Usuario desde la base de datos
+
         Usuario usuario = usuarioService.getByNombreUsuario(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // ✅ Verificar el límite de consultas
+
         Bucket bucket = rateLimiterService.resolveBucket(username);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(429).body(new Mensaje("Límite de consultas alcanzado. Intenta de nuevo en una hora."));
         }
 
         try {
-            // ✅ Pasar también el nombre de usuario
+
             PronosticoResponse pronostico = pronosticoService.obtenerPronostico(ciudad, usuario.getNombreUsuario());
 
-            // ✅ Guardar la consulta usando el objeto `Usuario`
+
             consultaService.registrarConsulta(usuario, ciudad, pronostico.toString());
 
             return ResponseEntity.ok(pronostico);

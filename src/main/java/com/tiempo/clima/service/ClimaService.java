@@ -32,15 +32,11 @@ public class ClimaService {
         if (response == null) {
             throw new RuntimeException("No se pudieron obtener datos del clima");
         }
-
-        // 🌡️ Obtener temperatura y otros datos
         Map<String, Object> main = (Map<String, Object>) response.get("main");
         double temperatura = (double) main.get("temp");
         double tempMin = (double) main.get("temp_min");
         double tempMax = (double) main.get("temp_max");
         double sensacionTermica = (double) main.get("feels_like");
-
-        // 🌤️ Extraer descripción del clima (es una lista)
         List<Map<String, Object>> weatherList = (List<Map<String, Object>>) response.get("weather");
         String descripcion = weatherList.get(0).get("description").toString();
 

@@ -26,7 +26,7 @@ public class PronosticoService {
 
     private final RestTemplate restTemplate;
     private final ConsultaRepository consultaRepository;
-    private final UsuarioService usuarioService; // ✅ Inyectado correctamente
+    private final UsuarioService usuarioService;
 
     @Value("${openweathermap.api.key}")
     private String apiKey;
@@ -44,19 +44,19 @@ public class PronosticoService {
                     pronostico.get(0).getDescripcion(),
                     pronostico.get(0).getTemperatura()
             );
-            guardarConsulta(nombreUsuario, ciudad, resultado); // ✅ Se pasa el nombre del usuario
+            guardarConsulta(nombreUsuario, ciudad, resultado);
         }
 
         return new PronosticoResponse(ciudad, pronostico);
     }
 
     private void guardarConsulta(String nombreUsuario, String ciudad, String resultado) {
-        // ✅ Buscar el objeto Usuario
+
         Usuario usuario = usuarioService.getByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Consulta consulta = new Consulta();
-        consulta.setUsuario(usuario); // ✅ Asignar el objeto Usuario
+        consulta.setUsuario(usuario);
         consulta.setCiudad(ciudad);
         consulta.setResultado(resultado);
         consulta.setFechaConsulta(LocalDateTime.now());

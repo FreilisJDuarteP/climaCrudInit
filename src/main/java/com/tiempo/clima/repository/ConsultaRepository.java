@@ -11,11 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
-
-    // Buscar por objeto Usuario directamente
     List<Consulta> findByUsuario(Usuario usuario);
 
-    // ✅ Buscar por nombre de usuario (String) con @Query
     @Query("SELECT c FROM Consulta c WHERE c.usuario.nombreUsuario = :nombreUsuario")
     List<Consulta> findByNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 }

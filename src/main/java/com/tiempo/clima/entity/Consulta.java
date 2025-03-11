@@ -1,4 +1,5 @@
 package com.tiempo.clima.entity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +16,13 @@ public class Consulta {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false) // ✅ Enlace con la clave foránea
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     private String ciudad;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String resultado;
+
     private LocalDateTime fechaConsulta;
 }

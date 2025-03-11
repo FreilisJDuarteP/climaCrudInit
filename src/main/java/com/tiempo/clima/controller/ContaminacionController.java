@@ -47,7 +47,7 @@ public class ContaminacionController {
 
         try {
             ContaminacionResponse calidadAire = contaminacionService.obtenerCalidadAire(nombreCiudad, username);
-            consultaService.registrarConsulta(usuario, nombreCiudad, calidadAire.toString()); // ✅ Guardar el objeto Usuario
+            consultaService.registrarConsulta(usuario, nombreCiudad, calidadAire.toString());
             return ResponseEntity.ok(calidadAire);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new Mensaje("Error: " + e.getMessage()));
