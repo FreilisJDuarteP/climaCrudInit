@@ -3,20 +3,39 @@ package com.tiempo.clima.service;
 import com.tiempo.clima.entity.Consulta;
 import com.tiempo.clima.entity.Usuario;
 import com.tiempo.clima.repository.ConsultaRepository;
+import com.tiempo.clima.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 public class ConsultaService {
 
     private final ConsultaRepository consultaRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public ConsultaService(ConsultaRepository consultaRepository) {
+    public ConsultaService(ConsultaRepository consultaRepository, UsuarioRepository usuarioRepository) {
         this.consultaRepository = consultaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Consulta> obtenerConsultasPorUsuario(Usuario usuario) {
+    // ✅ Registrar consulta con objeto Usuario
+    public void registrarConsulta(Usuario usuario, String ciudad, String resultado) {
+        Consulta consulta = new Consulta();
+        consulta.setUsuario(usuario);
+        consulta.setCiudad(ciudad);
+        consulta.setResultado(resultado);
+        consulta.setFechaConsulta(LocalDateTime.now());
+
+        consultaRepository.save(consulta);
+    }
+
+    // ✅ Buscar por nombre de usuario
+    public List<Consulta> obtenerConsultasPorUsuario(String nombreUsuario) {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         return consultaRepository.findByUsuario(usuario);
     }
 }

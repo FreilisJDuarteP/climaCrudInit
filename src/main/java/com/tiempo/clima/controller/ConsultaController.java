@@ -28,8 +28,7 @@ public class ConsultaController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/mis-consultas")
     public ResponseEntity<List<Consulta>> obtenerMisConsultas(@AuthenticationPrincipal UserDetails userDetails) {
-        Usuario usuario = usuarioService.getByNombreUsuario(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return ResponseEntity.ok(consultaService.obtenerConsultasPorUsuario(usuario));
+        String nombreUsuario = userDetails.getUsername();
+        return ResponseEntity.ok(consultaService.obtenerConsultasPorUsuario(nombreUsuario));
     }
 }

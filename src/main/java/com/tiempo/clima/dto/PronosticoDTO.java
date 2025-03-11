@@ -1,20 +1,19 @@
 package com.tiempo.clima.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.LocalDate;
-
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PronosticoDTO {
-    private LocalDate fecha;
+    private String ciudad;
+    private double temperatura;
     private String descripcion;
-    private double temperaturaMin;
-    private double temperaturaMax;
-    private double humedad;
+    private int humedad;
+    private double velocidadViento;
+    private double presion;
+    private String iconoClima;
+    private long fechaHora;
 }
