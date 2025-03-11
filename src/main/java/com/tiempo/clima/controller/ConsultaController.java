@@ -25,7 +25,7 @@ public class ConsultaController {
         this.usuarioService = usuarioService;
     }
 
-    @PreAuthorize("hasRole('USER')") // Solo usuarios autenticados pueden acceder
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/mis-consultas")
     public ResponseEntity<List<Consulta>> obtenerMisConsultas(@AuthenticationPrincipal UserDetails userDetails) {
         Usuario usuario = usuarioService.getByNombreUsuario(userDetails.getUsername())

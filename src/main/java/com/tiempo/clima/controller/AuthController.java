@@ -59,7 +59,7 @@ public class AuthController {
         usuario.setPassword(passwordEncoder.encode(nuevoUsuario.getPassword()));
 
         Set<Rol> roles = new HashSet<>();
-        Optional<Rol> userRole = rolService.getByRolNombre(RolNombre.USER); // Eliminado "ROLE_"
+        Optional<Rol> userRole = rolService.getByRolNombre(RolNombre.USER);
         if (userRole.isPresent()) {
             roles.add(userRole.get());
         } else {

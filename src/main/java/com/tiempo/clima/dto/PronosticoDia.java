@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class PronosticoDia {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")  // ⬅️ Esto corrige el formato de fecha
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dt_txt;
     private PronosticoMain main;
     private PronosticoWeather[] weather;

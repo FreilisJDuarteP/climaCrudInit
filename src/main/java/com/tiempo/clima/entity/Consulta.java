@@ -18,11 +18,9 @@ public class Consulta {
     private String tipoConsulta;
     private LocalDateTime fecha;
 
-    // Constructor vacío requerido por JPA
     public Consulta() {
     }
 
-    // Constructor con parámetros
     public Consulta(Usuario usuario, String ciudad, String tipoConsulta, LocalDateTime fecha) {
         this.usuario = usuario;
         this.ciudad = ciudad;
@@ -30,7 +28,6 @@ public class Consulta {
         this.fecha = fecha;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

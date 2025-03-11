@@ -1,6 +1,7 @@
 package com.tiempo.clima.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ClimaService {
     public ClimaService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+@Cacheable(value = "clima", key = "#ciudad")
     public Map<String, Object> obtenerClima(String ciudad) {
         String url = String.format("%s?q=%s&appid=%s&units=metric", apiUrl, ciudad, apiKey);
         ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);

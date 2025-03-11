@@ -2,6 +2,7 @@ package com.tiempo.clima.service;
 
 import com.tiempo.clima.dto.PronosticoResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,7 +20,7 @@ public class PronosticoService {
     public PronosticoService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+@Cacheable(value = "pronostico", key = "#ciudad")
     public PronosticoResponse obtenerPronostico(String ciudad) {
         String url = String.format("%s?q=%s&cnt=5&appid=%s&units=metric&lang=es", apiUrl, ciudad, apiKey);
         return restTemplate.getForObject(url, PronosticoResponse.class);
