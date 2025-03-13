@@ -25,4 +25,7 @@ public class Consulta {
     private String resultado;
 
     private LocalDateTime fechaConsulta;
+
+    @Column(nullable = false) // Asegura que el tipo de consulta siempre tenga un valor
+    private String tipoConsulta; // Nuevo campo para guardar el tipo de consulta (clima, contaminación, etc.)
 }

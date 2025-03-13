@@ -37,11 +37,11 @@ public class ContaminacionService {
     }
 
     @Cacheable(value = "contaminacion", key = "#ciudad")
+    @SuppressWarnings("unchecked")
     public ContaminacionResponse obtenerCalidadAire(String ciudad, String nombreUsuario) {
 
         Usuario usuario = usuarioService.getByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
 
         String geoUrl = String.format("%s?q=%s&limit=1&appid=%s", geoApiUrl, ciudad, apiKey);
         List<Map<String, Object>> geoResponse = restTemplate.getForObject(geoUrl, List.class);
@@ -51,9 +51,8 @@ public class ContaminacionService {
         }
 
         Map<String, Object> location = geoResponse.get(0);
-        double lat = (double) location.get("lat");
-        double lon = (double) location.get("lon");
-
+        double lat = ((Number) location.get("lat")).doubleValue();
+        double lon = ((Number) location.get("lon")).doubleValue();
 
         String pollutionUrl = String.format("%s?lat=%f&lon=%f&appid=%s", pollutionApiUrl, lat, lon, apiKey);
         Map<String, Object> pollutionResponse = restTemplate.getForObject(pollutionUrl, Map.class);
@@ -64,16 +63,14 @@ public class ContaminacionService {
 
         List<Map<String, Object>> list = (List<Map<String, Object>>) pollutionResponse.get("list");
         Map<String, Object> main = (Map<String, Object>) list.get(0).get("main");
-        int aqi = (int) main.get("aqi");
-
+        int aqi = ((Number) main.get("aqi")).intValue();
 
         String resultado = traducirAqi(aqi);
-        consultaService.registrarConsulta(usuario, ciudad, resultado);
 
-        return new ContaminacionResponse(
-                ciudad,
-                resultado
-        );
+        // ✅ Registrar consulta correctamente
+        consultaService.registrarConsulta(usuario, ciudad, resultado, "Consulta de contaminación");
+
+        return new ContaminacionResponse(ciudad, resultado);
     }
 
     private String traducirAqi(int aqi) {

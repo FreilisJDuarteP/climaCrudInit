@@ -44,14 +44,13 @@ public class PronosticoService {
                     pronostico.get(0).getDescripcion(),
                     pronostico.get(0).getTemperatura()
             );
-            guardarConsulta(nombreUsuario, ciudad, resultado);
+            guardarConsulta(nombreUsuario, ciudad, resultado, "Consulta de pronóstico");
         }
 
         return new PronosticoResponse(ciudad, pronostico);
     }
 
-    private void guardarConsulta(String nombreUsuario, String ciudad, String resultado) {
-
+    private void guardarConsulta(String nombreUsuario, String ciudad, String resultado, String tipoConsulta) {
         Usuario usuario = usuarioService.getByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -60,6 +59,8 @@ public class PronosticoService {
         consulta.setCiudad(ciudad);
         consulta.setResultado(resultado);
         consulta.setFechaConsulta(LocalDateTime.now());
+        consulta.setTipoConsulta(tipoConsulta); // ✅ Guardar el tipo de consulta
+
         consultaRepository.save(consulta);
     }
 

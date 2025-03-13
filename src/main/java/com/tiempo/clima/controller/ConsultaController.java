@@ -1,9 +1,7 @@
 package com.tiempo.clima.controller;
 
-import com.tiempo.clima.entity.Consulta;
-import com.tiempo.clima.entity.Usuario;
+import com.tiempo.clima.dto.ConsultaDTO;
 import com.tiempo.clima.service.ConsultaService;
-import com.tiempo.clima.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,17 +21,12 @@ import java.util.List;
 public class ConsultaController {
 
     private final ConsultaService consultaService;
-    private final UsuarioService usuarioService;
 
-    public ConsultaController(ConsultaService consultaService, UsuarioService usuarioService) {
+    public ConsultaController(ConsultaService consultaService) {
         this.consultaService = consultaService;
-        this.usuarioService = usuarioService;
     }
 
-    @Operation(
-            summary = "Obtener historial de consultas del usuario",
-            description = "Devuelve el historial de consultas realizadas por el usuario autenticado."
-    )
+    @Operation(summary = "Obtener historial de consultas del usuario autenticado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Historial de consultas obtenido correctamente"),
             @ApiResponse(responseCode = "403", description = "Acceso denegado"),
@@ -41,9 +34,21 @@ public class ConsultaController {
     })
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/mis-consultas")
-    public ResponseEntity<List<Consulta>> obtenerMisConsultas(
+    public ResponseEntity<List<ConsultaDTO>> obtenerMisConsultas(
             @AuthenticationPrincipal UserDetails userDetails) {
         String nombreUsuario = userDetails.getUsername();
         return ResponseEntity.ok(consultaService.obtenerConsultasPorUsuario(nombreUsuario));
+    }
+
+    @Operation(summary = "Obtener historial de todas las consultas (solo para ADMIN)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Historial de consultas obtenido correctamente"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado"),
+            @ApiResponse(responseCode = "500", description = "Error inesperado del servidor")
+    })
+    @PreAuthorize("hasRole('ADMIN')") // Solo los administradores pueden acceder
+    @GetMapping("/todas")
+    public ResponseEntity<List<ConsultaDTO>> obtenerTodasLasConsultas() {
+        return ResponseEntity.ok(consultaService.obtenerTodasLasConsultas());
     }
 }
