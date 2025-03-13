@@ -1,4 +1,5 @@
 package com.tiempo.clima.controller;
+
 import com.tiempo.clima.service.ConsultaService;
 import com.tiempo.clima.dto.ContaminacionResponse;
 import com.tiempo.clima.dto.Mensaje;
@@ -13,9 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import com.tiempo.clima.entity.Usuario;
 import com.tiempo.clima.service.UsuarioService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/contaminacion")
 @CrossOrigin
+@Tag(name = "Contaminación", description = "Endpoints para consultar calidad del aire")
 public class ContaminacionController {
 
     private final ContaminacionService contaminacionService;
@@ -34,8 +42,22 @@ public class ContaminacionController {
         this.rateLimiterService = rateLimiterService;
     }
 
+    @Operation(
+            summary = "Obtener calidad del aire por ciudad",
+            description = "Obtiene la calidad del aire para una ciudad específica usando las coordenadas de OpenWeatherMap."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Consulta de calidad de aire exitosa"),
+            @ApiResponse(responseCode = "400", description = "Error al obtener la calidad de aire"),
+            @ApiResponse(responseCode = "429", description = "Límite de consultas alcanzado"),
+            @ApiResponse(responseCode = "500", description = "Error inesperado del servidor")
+    })
     @GetMapping("/ciudad/{nombreCiudad}")
-    public ResponseEntity<?> obtenerCalidadAire(@PathVariable String nombreCiudad, Authentication authentication) {
+    public ResponseEntity<?> obtenerCalidadAire(
+            @Parameter(description = "Nombre de la ciudad a consultar", example = "Bogotá")
+            @PathVariable String nombreCiudad,
+            Authentication authentication) {
+
         String username = authentication.getName();
         Usuario usuario = usuarioService.getByNombreUsuario(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

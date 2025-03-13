@@ -5,11 +5,16 @@ import com.tiempo.clima.dto.Mensaje;
 import com.tiempo.clima.service.ClimaService;
 import com.tiempo.clima.service.RateLimiterService;
 import io.github.bucket4j.Bucket;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Clima", description = "Endpoints para obtener información sobre el clima")
 @RestController
 @RequestMapping("/clima")
 @CrossOrigin
@@ -23,9 +28,23 @@ public class ClimaController {
         this.rateLimiterService = rateLimiterService;
     }
 
+    @Operation(
+            summary = "Obtener clima de una ciudad",
+            description = "Devuelve el clima actual para una ciudad específica.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Clima obtenido correctamente"),
+                    @ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
+                    @ApiResponse(responseCode = "429", description = "Límite de consultas alcanzado"),
+                    @ApiResponse(responseCode = "401", description = "No autorizado")
+            }
+    )
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/ciudad/{nombreCiudad}")
-    public ResponseEntity<?> obtenerClima(@PathVariable String nombreCiudad, Authentication authentication) {
+    public ResponseEntity<?> obtenerClima(
+            @Parameter(description = "Nombre de la ciudad", example = "Bogotá")
+            @PathVariable String nombreCiudad,
+            Authentication authentication) {
+
         String username = authentication.getName();
         Bucket bucket = rateLimiterService.resolveBucket(username);
 

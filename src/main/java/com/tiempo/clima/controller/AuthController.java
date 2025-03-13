@@ -10,6 +10,10 @@ import com.tiempo.clima.security.enums.RolNombre;
 import com.tiempo.clima.security.jwt.JwtProvider;
 import com.tiempo.clima.service.RolService;
 import com.tiempo.clima.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +28,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Tag(name = "Autenticación", description = "Endpoints para la autenticación y registro de usuarios")
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
@@ -44,6 +49,12 @@ public class AuthController {
         this.jwtProvider = jwtProvider;
     }
 
+    @Operation(summary = "Registrar un nuevo usuario", description = "Registra un nuevo usuario con el rol USER.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuario registrado correctamente"),
+            @ApiResponse(responseCode = "400", description = "El nombre de usuario o el email ya existen"),
+            @ApiResponse(responseCode = "500", description = "Error interno al registrar el usuario")
+    })
     @PostMapping("/nuevo")
     public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario) {
         if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario())) {
@@ -72,6 +83,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new Mensaje("Usuario guardado"));
     }
 
+    @Operation(summary = "Iniciar sesión", description = "Autentica a un usuario y devuelve un token JWT.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario autenticado correctamente"),
+            @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginUsuario loginUsuario) {
         Authentication authentication = authenticationManager.authenticate(
