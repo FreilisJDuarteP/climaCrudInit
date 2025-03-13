@@ -49,7 +49,7 @@ public class AuthController {
         this.jwtProvider = jwtProvider;
     }
 
-    @Operation(summary = "Registrar un nuevo usuario", description = "Registra un nuevo usuario con el rol USER.")
+    @Operation(summary = "Registrar un nuevo usuario", description = "Registra un nuevo usuario con roles específicos.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuario registrado correctamente"),
             @ApiResponse(responseCode = "400", description = "El nombre de usuario o el email ya existen"),
@@ -69,13 +69,35 @@ public class AuthController {
         usuario.setEmail(nuevoUsuario.getEmail());
         usuario.setPassword(passwordEncoder.encode(nuevoUsuario.getPassword()));
 
+        // 👉 **Asignación de roles**
         Set<Rol> roles = new HashSet<>();
-        Optional<Rol> userRole = rolService.getByRolNombre(RolNombre.USER);
-        if (userRole.isPresent()) {
-            roles.add(userRole.get());
+
+        if (nuevoUsuario.getRoles() == null || nuevoUsuario.getRoles().isEmpty()) {
+            // ✅ Si no se especifican roles, se asigna automáticamente el rol USER
+            Optional<Rol> userRole = rolService.getByRolNombre(RolNombre.USER);
+            if (userRole.isPresent()) {
+                roles.add(userRole.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new Mensaje("Error: El rol USER no está registrado en la base de datos"));
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Mensaje("Error: El rol USER no está en la base de datos"));
+            // ✅ Si hay roles, validar y asignar
+            for (String rolStr : nuevoUsuario.getRoles()) {
+                try {
+                    RolNombre rolNombre = RolNombre.valueOf(rolStr.toUpperCase());
+                    Optional<Rol> rol = rolService.getByRolNombre(rolNombre);
+                    if (rol.isPresent()) {
+                        roles.add(rol.get());
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(new Mensaje("Error: El rol " + rolStr + " no está registrado en la base de datos"));
+                    }
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new Mensaje("Error: Rol inválido - " + rolStr));
+                }
+            }
         }
 
         usuario.setRoles(roles);

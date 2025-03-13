@@ -67,7 +67,6 @@ public class ContaminacionService {
 
         String resultado = traducirAqi(aqi);
 
-        // ✅ Registrar consulta correctamente
         consultaService.registrarConsulta(usuario, ciudad, resultado, "Consulta de contaminación");
 
         return new ContaminacionResponse(ciudad, resultado);

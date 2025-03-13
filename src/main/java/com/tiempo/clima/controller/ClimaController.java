@@ -38,7 +38,7 @@ public class ClimaController {
                     @ApiResponse(responseCode = "401", description = "No autorizado")
             }
     )
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ciudad/{nombreCiudad}")
     public ResponseEntity<?> obtenerClima(
             @Parameter(description = "Nombre de la ciudad", example = "Bogotá")
@@ -53,7 +53,8 @@ public class ClimaController {
         }
 
         try {
-            ClimaResponse clima = climaService.obtenerClima(nombreCiudad);
+
+            ClimaResponse clima = climaService.obtenerClima(nombreCiudad, username);
             return ResponseEntity.ok(clima);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new Mensaje("Error al obtener el clima: " + e.getMessage()));

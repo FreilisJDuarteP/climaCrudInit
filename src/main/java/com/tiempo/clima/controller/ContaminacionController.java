@@ -9,6 +9,7 @@ import com.tiempo.clima.service.RateLimiterService;
 import com.tiempo.clima.service.UsuarioService;
 import io.github.bucket4j.Bucket;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class ContaminacionController {
         this.consultaService = consultaService;
         this.rateLimiterService = rateLimiterService;
     }
-
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/ciudad/{nombreCiudad}")
     public ResponseEntity<?> obtenerCalidadAire(@PathVariable String nombreCiudad, Authentication authentication) {
         String username = authentication.getName();

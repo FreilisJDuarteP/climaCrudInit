@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class PronosticoController {
     @ApiResponse(responseCode = "200", description = "Pronóstico obtenido correctamente")
     @ApiResponse(responseCode = "400", description = "Error al obtener el pronóstico")
     @ApiResponse(responseCode = "429", description = "Límite de consultas alcanzado")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/{ciudad}")
     public ResponseEntity<?> obtenerPronostico(
             @PathVariable String ciudad,
@@ -37,7 +39,7 @@ public class PronosticoController {
 
         String username = authentication.getName();
 
-        // Verificación de límite de consultas
+
         Bucket bucket = rateLimiterService.resolveBucket(username);
         if (!bucket.tryConsume(1)) {
             return ResponseEntity.status(429).body(new Mensaje("Límite de consultas alcanzado. Intenta de nuevo en una hora."));

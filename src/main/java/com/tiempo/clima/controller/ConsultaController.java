@@ -32,8 +32,8 @@ public class ConsultaController {
             @ApiResponse(responseCode = "403", description = "Acceso denegado"),
             @ApiResponse(responseCode = "500", description = "Error inesperado del servidor")
     })
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/mis-consultas")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/miconsulta")
     public ResponseEntity<List<ConsultaDTO>> obtenerMisConsultas(
             @AuthenticationPrincipal UserDetails userDetails) {
         String nombreUsuario = userDetails.getUsername();
@@ -46,7 +46,7 @@ public class ConsultaController {
             @ApiResponse(responseCode = "403", description = "Acceso denegado"),
             @ApiResponse(responseCode = "500", description = "Error inesperado del servidor")
     })
-    @PreAuthorize("hasRole('ADMIN')") // Solo los administradores pueden acceder
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/todas")
     public ResponseEntity<List<ConsultaDTO>> obtenerTodasLasConsultas() {
         return ResponseEntity.ok(consultaService.obtenerTodasLasConsultas());
